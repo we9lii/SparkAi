@@ -74,6 +74,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onClearChat
 
       recognition.onerror = (event: any) => {
         console.error('Speech recognition error', event.error);
+        if (event.error === 'not-allowed') {
+          alert('تم رفض الوصول إلى المايكروفون. يرجى تمكين الوصول في إعدادات المتصفح لاستخدام هذه الميزة.');
+        }
         setIsListening(false);
       };
 
@@ -95,8 +98,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onClearChat
       setIsListening(false);
     } else {
       if (recognitionRef.current) {
-        recognitionRef.current.start();
-        setIsListening(true);
+        try {
+          recognitionRef.current.start();
+          setIsListening(true);
+        } catch (err) {
+            console.error("Error starting speech recognition:", err);
+            setIsListening(false);
+        }
       } else {
         alert('المعذرة، خاصية الإدخال الصوتي غير مدعومة في متصفحك.');
       }
