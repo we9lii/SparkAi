@@ -1,0 +1,7 @@
+{
+  "name": "Spark Chat",
+  "description": "An intelligent chat application featuring 'Spark', an AI assistant developed by Faisal. Interact with Google's Gemini model with a fun and intelligent persona. The app supports multimodal chat (text and images), text-to-speech, local chat history, and more.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
