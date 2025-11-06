@@ -126,7 +126,11 @@ const App: React.FC = () => {
     let finalAssistantResponse = '';
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+      if (!apiKey) {
+        throw new Error('Missing VITE_GEMINI_API_KEY in environment.');
+      }
+      const ai = new GoogleGenAI({ apiKey });
       const currentConversation = conversations.find(c => c.id === currentConvId);
       const history = currentConversation?.messages.slice(0, -2) ?? [];
       const stream = generateResponseStream(ai, SYSTEM_PROMPT, history, userParts, selectedModel);
@@ -149,7 +153,7 @@ const App: React.FC = () => {
       finalAssistantResponse = fullResponse;
 
     } catch (err) {
-      const errorMessage = 'عذرًا، في مشكلة بالاتصال!';
+      const errorMessage = 'عذرًا، في مشكلة بالمفاتيح أو بالاتصال! تأكد من إضافة المفتاح في ملف البيئة.';
       setConversations(prev => prev.map(conv => {
          if (conv.id === currentConvId) {
             const newMessages = [...conv.messages];

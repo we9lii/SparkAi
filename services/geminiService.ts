@@ -83,7 +83,11 @@ async function decodeAudioData(
 
 export async function generateSpeech(text: string): Promise<AudioBuffer | null> {
     try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+        if (!apiKey) {
+            throw new Error('Missing VITE_GEMINI_API_KEY in environment.');
+        }
+        const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash-preview-tts",
             contents: [{ parts: [{ text: text }] }],
@@ -118,7 +122,11 @@ export async function generateTitle(
   assistantResponse: string
 ): Promise<string> {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+    if (!apiKey) {
+      throw new Error('Missing VITE_GEMINI_API_KEY in environment.');
+    }
+    const ai = new GoogleGenAI({ apiKey });
     const prompt = `بناءً على الحوار التالي، اقترح عنوانًا قصيرًا وموجزًا (4 كلمات كحد أقصى) لهذه المحادثة. أجب بالعنوان فقط دون أي مقدمات أو نصوص إضافية.
 
 المستخدم: "${userPrompt}"
