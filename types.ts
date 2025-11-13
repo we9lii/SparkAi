@@ -18,4 +18,10 @@ export interface Conversation {
   messages: Message[];
   model: Model;
   createdAt: string;
+  mode?: 'chat' | 'builder';
+}
+
+export interface FileEntry {
+  path: string;
+  content: string;
 }

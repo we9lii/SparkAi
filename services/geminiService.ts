@@ -1,5 +1,5 @@
 import { GoogleGenAI, Modality, Chat } from '@google/genai';
-import type { Message, Model, Part } from '../types';
+import type { Message, Model, Part, FileEntry } from '../types';
 
 function mapMessagesToGeminiHistory(messages: Message[]) {
     return messages
@@ -142,5 +142,63 @@ export async function generateTitle(
   } catch (error) {
     console.error("Gemini Title Generation error:", error);
     return ''; 
+  }
+}
+
+// --- Project Manifest Generation ---
+
+export async function generateProjectManifest(
+  description: string,
+  model: Model = 'gemini-2.5-pro'
+): Promise<FileEntry[]> {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+  if (!apiKey) {
+    throw new Error('Missing VITE_GEMINI_API_KEY in environment.');
+  }
+  const ai = new GoogleGenAI({ apiKey });
+
+  const prompt = `أنت منشئ مشاريع واجهات أمامية. أنشئ ملفات مشروع React + Vite (واجهة فقط) حسب الوصف التالي.
+
+المتطلبات:
+- أجب بصيغة JSON فقط، بدون أي نص إضافي.
+- البنية:
+[
+  {"path": "index.html", "content": "..."},
+  {"path": "src/App.tsx", "content": "..."},
+  {"path": "public/vite.svg", "content": "..."}
+]
+- لا تستخدم شفرات ثلاثية أو وسوم Markdown.
+- اجعل المحتوى مكتوبًا بنص عادي داخل خاصية content.
+- ضَع favicon باسم public/vite.svg حتى لا يظهر تحذير 404.
+ - أضف ملفًا "preview.html" ذاتي الاكتفاء (Self-contained): كل CSS و JS بداخله بدون واردات خارجية أو وحدات، حتى نعرض معاينة مباشرة داخل iframe.
+
+الوصف:
+${description}
+`;
+
+  const response = await ai.models.generateContent({
+    model,
+    contents: prompt,
+  });
+  const raw = response.text?.trim() ?? '';
+
+  // Try direct JSON parse; then try to extract array region if needed.
+  function tryParse(jsonText: string): FileEntry[] {
+    const val = JSON.parse(jsonText);
+    if (!Array.isArray(val)) throw new Error('Manifest must be a JSON array.');
+    return val.map((item: any) => ({ path: String(item.path), content: String(item.content ?? '') }));
+  }
+
+  try {
+    return tryParse(raw);
+  } catch {
+    // Attempt to find first [ ... ] block
+    const start = raw.indexOf('[');
+    const end = raw.lastIndexOf(']');
+    if (start !== -1 && end !== -1 && end > start) {
+      const sliced = raw.slice(start, end + 1);
+      return tryParse(sliced);
+    }
+    throw new Error('تعذر تحليل مخرجات النموذج إلى JSON صالح.');
   }
 }

@@ -13,6 +13,7 @@ interface SidebarProps {
   onRenameConversation: (id: string, newTitle: string) => void;
   isOpen: boolean;
   onClose: () => void;
+  onOpenProjectBuilder: () => void;
 }
 
 const ConversationItem: React.FC<{
@@ -68,9 +69,12 @@ const ConversationItem: React.FC<{
                     className="w-full text-right p-2 rounded-md truncate text-sm bg-zinc-200 dark:bg-zinc-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                 />
             ) : (
-                <button
+                <div
+                    role="button"
+                    tabIndex={0}
                     onClick={onSelect}
-                    className={`w-full text-right p-2 rounded-md truncate text-sm transition-colors flex items-center justify-between ${
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSelect(); }}
+                    className={`w-full text-right p-2 rounded-md truncate text-sm transition-colors flex items-center justify-between cursor-pointer ${
                     isActive
                         ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
                         : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800'
@@ -81,7 +85,7 @@ const ConversationItem: React.FC<{
                        <button onClick={(e) => { e.stopPropagation(); setIsEditing(true); }} className="p-1 hover:text-white"><PencilIcon className="h-4 w-4" /></button>
                        <button onClick={(e) => { e.stopPropagation(); if (window.confirm(`هل أنت متأكد من حذف "${conv.title}"؟`)) onDelete(); }} className="p-1 hover:text-red-500"><TrashIcon className="h-4 w-4" /></button>
                     </div>
-                </button>
+                </div>
             )}
         </li>
     )
@@ -98,6 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onRenameConversation,
   isOpen,
   onClose,
+  onOpenProjectBuilder,
 }) => {
   return (
     <aside className={`w-72 bg-white/30 dark:bg-zinc-900/50 backdrop-blur-xl flex flex-col border-l border-black/5 dark:border-white/10
@@ -149,6 +154,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
             <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
           </select>
+          <div className="pt-3">
+            <button
+              onClick={onOpenProjectBuilder}
+              className="w-full p-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              Build — مُنشئ المشاريع
+            </button>
+          </div>
         </div>
       </div>
     </aside>
