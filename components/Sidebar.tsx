@@ -13,7 +13,6 @@ interface SidebarProps {
   onRenameConversation: (id: string, newTitle: string) => void;
   isOpen: boolean;
   onClose: () => void;
-  onOpenProjectBuilder: () => void;
 }
 
 const ConversationItem: React.FC<{
@@ -102,10 +101,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onRenameConversation,
   isOpen,
   onClose,
-  onOpenProjectBuilder,
 }) => {
   return (
-    <aside className={`w-72 bg-white/30 dark:bg-zinc-900/50 backdrop-blur-xl flex flex-col border-l border-black/5 dark:border-white/10
+    <aside className={`sidebar-panel w-72 bg-white/30 dark:bg-zinc-900/50 backdrop-blur-xl flex flex-col border-l border-black/5 dark:border-white/10
         fixed top-0 h-full z-40 transform transition-transform duration-300
         ${isOpen ? 'translate-x-0' : 'translate-x-full'}
     `}>
@@ -154,14 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
             <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
           </select>
-          <div className="pt-3">
-            <button
-              onClick={onOpenProjectBuilder}
-              className="w-full p-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-              Build — مُنشئ المشاريع
-            </button>
-          </div>
+          
         </div>
       </div>
     </aside>

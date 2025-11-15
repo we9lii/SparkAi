@@ -83,9 +83,9 @@ async function decodeAudioData(
 
 export async function generateSpeech(text: string): Promise<AudioBuffer | null> {
     try {
-        const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+        const apiKey = (import.meta.env as any).GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY;
         if (!apiKey) {
-            throw new Error('Missing VITE_GEMINI_API_KEY in environment.');
+            throw new Error('Missing GEMINI_API_KEY in environment.');
         }
         const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
@@ -122,9 +122,9 @@ export async function generateTitle(
   assistantResponse: string
 ): Promise<string> {
   try {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+    const apiKey = (import.meta.env as any).GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY;
     if (!apiKey) {
-      throw new Error('Missing VITE_GEMINI_API_KEY in environment.');
+      throw new Error('Missing GEMINI_API_KEY in environment.');
     }
     const ai = new GoogleGenAI({ apiKey });
     const prompt = `بناءً على الحوار التالي، اقترح عنوانًا قصيرًا وموجزًا (4 كلمات كحد أقصى) لهذه المحادثة. أجب بالعنوان فقط دون أي مقدمات أو نصوص إضافية.
@@ -151,9 +151,9 @@ export async function generateProjectManifest(
   description: string,
   model: Model = 'gemini-2.5-pro'
 ): Promise<FileEntry[]> {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+  const apiKey = (import.meta.env as any).GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error('Missing VITE_GEMINI_API_KEY in environment.');
+    throw new Error('Missing GEMINI_API_KEY in environment.');
   }
   const ai = new GoogleGenAI({ apiKey });
 

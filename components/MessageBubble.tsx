@@ -118,7 +118,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
 
   return (
     <div className={containerClasses}>
-      <div className={`p-3 rounded-lg max-w-sm md:max-w-md lg:max-w-2xl shadow ${bubbleClasses}`}>
+      <div className={`message-bubble-card p-3 rounded-lg max-w-sm md:max-w-md lg:max-w-2xl shadow ${bubbleClasses}`}>
         <div className="space-y-2">
          {message.parts.map((part, index) => {
            if ('inlineData' in part) {

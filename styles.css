@@ -1,0 +1,130 @@
+/* SparkAI — minimal modern design touches */
+:root {
+  --bg-start: #0b0f19;
+  --bg-end: #0e1324;
+  --accent: #60a5fa; /* blue-400 */
+  --accent-2: #22d3ee; /* cyan-400 */
+  --card-bg: rgba(20, 24, 36, 0.6);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --shadow: 0 6px 24px rgba(0,0,0,0.25);
+  --bg-pattern-url: url('/bg-marble.jpg');
+}
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  color: #e5e7eb;
+  background: #000000;
+  background-attachment: fixed;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+}
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Header accent */
+.site-header {
+  backdrop-filter: saturate(140%) blur(8px);
+}
+.site-header::after {
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  opacity: 0.25;
+}
+
+/* Message bubbles */
+.message-bubble-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
+}
+.message-bubble-card img { border-radius: 12px; }
+
+/* Chat input */
+.chat-input {
+  background: rgba(18,22,34,0.6);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.chat-input:focus-within {
+  box-shadow: 0 0 0 2px rgba(96,165,250,0.35), 0 12px 36px rgba(0,0,0,0.25);
+}
+
+/* Chat box wrapper for clarity */
+.chat-box {
+  background: rgba(18,22,34,0.45);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.30);
+  backdrop-filter: saturate(140%) blur(10px);
+  padding: 12px;
+}
+
+/* Sidebar */
+.sidebar-panel {
+  backdrop-filter: saturate(140%) blur(10px);
+  border-left: 1px solid var(--card-border);
+}
+
+/* Scrollbar */
+.custom-scrollbar::-webkit-scrollbar { width: 10px; height: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(96,165,250,0.4), rgba(34,211,238,0.4));
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+
+/* Markdown typography tweaks */
+.prose pre { border-radius: 12px; }
+.prose code { border-radius: 6px; }
+
+/* Microphone pulse */
+.mic-button {
+  position: relative;
+}
+.mic-button[data-listening="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(226,50,50,0.35) 0%, rgba(226,50,50,0.0) 60%);
+  animation: micPulse 1.4s ease-out infinite;
+}
+.mic-button .mic-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #ef4444; /* red-500 */
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+.mic-button[data-listening="true"] .mic-dot {
+  opacity: 1;
+  transform: scale(1);
+}
+@keyframes micPulse {
+  0% { opacity: 0.2; transform: scale(0.9); }
+  50% { opacity: 0.45; transform: scale(1.05); }
+  100% { opacity: 0.2; transform: scale(0.9); }
+}
+
+/* Gradient send button */
+.btn-gradient {
+  background-image: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+}
+.btn-gradient:hover { filter: brightness(1.05); }

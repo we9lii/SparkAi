@@ -32,6 +32,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onClearChat
   const [text, setText] = useState('');
   const [image, setImage] = useState<{ file: File; preview: string; data?: { mimeType: string; data: string } } | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,6 +56,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onClearChat
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
+      setIsSpeechSupported(true);
       const recognition = new SpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = true;
@@ -138,7 +140,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onClearChat
   };
 
   return (
-    <div className="flex flex-col gap-2 p-1.5 rounded-xl border border-zinc-300/50 dark:border-zinc-700/50 bg-zinc-50/80 dark:bg-zinc-800/70 backdrop-blur-lg focus-within:ring-2 focus-within:ring-blue-500 transition-shadow duration-200">
+    <div className="chat-input flex flex-col gap-2 p-1.5 rounded-xl border border-zinc-300/50 dark:border-zinc-700/50 bg-zinc-50/80 dark:bg-zinc-800/70 backdrop-blur-lg focus-within:ring-2 focus-within:ring-blue-500 transition-shadow duration-200">
       {image && (
         <div className="relative w-20 h-20 m-1">
             <img src={image.preview} alt="Preview" className="w-full h-full object-cover rounded-md" />
@@ -178,13 +180,18 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onClearChat
           className="hidden" 
           accept="image/*"
         />
-         <button
+        <button
           onClick={handleListen}
-          disabled={isLoading}
-          className={`p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors self-end ${isListening ? 'text-red-500' : 'text-zinc-500'}`}
-          aria-label="Use voice input"
+          disabled={isLoading || !isSpeechSupported}
+          className={`mic-button p-2 rounded-full focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors self-end ${isListening ? 'text-red-500 bg-red-500/10 dark:bg-red-500/15' : 'text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-600'}`}
+          aria-label="استخدام الإدخال الصوتي"
+          aria-pressed={isListening}
+          data-listening={isListening}
+          data-supported={isSpeechSupported}
+          title={isSpeechSupported ? (isListening ? 'الاستماع قيد التشغيل — اضغط للإيقاف' : 'التسجيل الصوتي') : 'خاصية الإدخال الصوتي غير مدعومة في هذا المتصفح'}
         >
-          <MicrophoneIcon className="h-5 w-5" />
+          <MicrophoneIcon className={`h-5 w-5 ${isListening ? 'animate-pulse' : ''}`} />
+          <span className="mic-dot" aria-hidden="true" />
         </button>
         <textarea
           ref={textareaRef}
@@ -209,7 +216,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onClearChat
             <button
                 onClick={handleSubmit}
                 disabled={!text.trim() && !image}
-                className="p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 dark:focus:ring-offset-zinc-800 disabled:bg-blue-400 disabled:cursor-not-allowed dark:disabled:bg-blue-800 transition-colors self-end"
+                className="p-2 rounded-full btn-gradient text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 dark:focus:ring-offset-zinc-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors self-end"
                 aria-label="Send message"
             >
                 <SendIcon className="h-5 w-5" />

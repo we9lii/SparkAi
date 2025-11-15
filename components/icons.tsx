@@ -75,7 +75,9 @@ export const ArrowPathIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) =>
 
 export const MicrophoneIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m12 7.5v-1.5a6 6 0 0 0-12 0v1.5m12 0v-1.5a6 6 0 0 0-12 0v1.5m0-15a.75.75 0 0 0-.75.75v3a.75.75 0 0 0 1.5 0v-3A.75.75 0 0 0 12 3.75Z" />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9.75h7.5" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c1.657 0 3 1.343 3 3v5c0 1.657-1.343 3-3 3s-3-1.343-3-3V6c0-1.657 1.343-3 3-3Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5a7.5 7.5 0 0 1-15 0" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v3" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8 21h8" />
   </svg>
 );

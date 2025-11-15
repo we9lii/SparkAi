@@ -4,19 +4,14 @@ import { MessageList } from './components/MessageList';
 import { ChatInput } from './components/ChatInput';
 import { Sidebar } from './components/Sidebar';
 import { generateResponseStream, generateTitle } from './services/geminiService';
-import type { Theme, Message, Conversation, Model, Part, FileEntry } from './types';
+import type { Theme, Message, Conversation, Model, Part } from './types';
 import { DEVELOPER_LOGO_URL, SYSTEM_PROMPT } from './constants';
 import { GoogleGenAI } from '@google/genai';
-import ProjectBuilderModal from './components/ProjectBuilderModal';
-import { generateProjectManifest } from './services/geminiService';
+ 
 
 const App: React.FC = () => {
   const [theme, setTheme] = useState<Theme>('dark'); // Hardcoded to dark theme
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isProjectBuilderOpen, setIsProjectBuilderOpen] = useState(false);
-  const [builderManifest, setBuilderManifest] = useState<FileEntry[] | null>(null);
-  const [builderProjectName, setBuilderProjectName] = useState<string>('spark-project');
-  const [builderDescription, setBuilderDescription] = useState<string>('');
 
   const [conversations, setConversations] = useState<Conversation[]>(() => {
     const savedConversations = localStorage.getItem('chatHistory');
@@ -60,24 +55,7 @@ const App: React.FC = () => {
     setIsSidebarOpen(false);
   };
 
-  const startBuilderConversation = () => {
-    const convId = `conv-${Date.now()}`;
-    const intro: Message = {
-      role: 'assistant',
-      parts: [{ text: 'اكتب وصف المشروع الذي تريد بناءه (نوع الواجهة، الصفحات، المكونات، التصميم). سأُنشئ الملفات تلقائيًا لتقوم بتنزيلها كـ ZIP.' }]
-    };
-    const newConversation: Conversation = {
-      id: convId,
-      title: 'منشئ مشروع جديد',
-      messages: [intro],
-      model: selectedModel,
-      createdAt: new Date().toISOString(),
-      mode: 'builder',
-    };
-    setConversations(prev => [newConversation, ...prev]);
-    setActiveConversationId(convId);
-    setIsSidebarOpen(false);
-  };
+  
 
   const activeConversation = conversations.find(c => c.id === activeConversationId);
   const hasMessages = activeConversation ? activeConversation.messages.length > 0 : false;
@@ -152,31 +130,12 @@ const App: React.FC = () => {
     let finalAssistantResponse = '';
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+      const apiKey = (import.meta.env as any).GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY;
       if (!apiKey) {
-        throw new Error('Missing VITE_GEMINI_API_KEY in environment.');
+        throw new Error('مفقود المفتاح GEMINI_API_KEY في البيئة.');
       }
       const currentConversation = conversations.find(c => c.id === currentConvId);
-      const mode = currentConversation?.mode ?? 'chat';
-      if (mode === 'builder') {
-        // Project generation path: call Gemini to produce a JSON manifest and open the builder modal.
-        const descriptionText = text.trim();
-        const manifest = await generateProjectManifest(descriptionText, selectedModel);
-        finalAssistantResponse = 'تم إنشاء ملفات المشروع تلقائيًا بناءً على وصفك. يمكنك تنزيل الحزمة الآن.';
-        setBuilderManifest(manifest);
-        setBuilderProjectName((descriptionText || 'spark-project').slice(0, 40));
-        setBuilderDescription(descriptionText);
-        setIsProjectBuilderOpen(true);
-        // Update assistant message with success note
-        setConversations(prev => prev.map(conv => {
-          if (conv.id === currentConvId) {
-            const newMessages = [...conv.messages];
-            newMessages[newMessages.length - 1] = { role: 'assistant', parts: [{ text: finalAssistantResponse }] };
-            return { ...conv, messages: newMessages };
-          }
-          return conv;
-        }));
-      } else {
+      {
         // Normal chat streaming path
         const ai = new GoogleGenAI({ apiKey });
         const history = currentConversation?.messages.slice(0, -2) ?? [];
@@ -201,7 +160,7 @@ const App: React.FC = () => {
       }
 
     } catch (err) {
-      const errorMessage = 'عذرًا، في مشكلة بالمفاتيح أو بالاتصال! تأكد من إضافة المفتاح في ملف البيئة.';
+      const errorMessage = 'عذرًا، هناك مشكلة بالمفاتيح أو بالاتصال! تأكد من إضافة المفتاح GEMINI_API_KEY في ملف البيئة.';
       setConversations(prev => prev.map(conv => {
          if (conv.id === currentConvId) {
             const newMessages = [...conv.messages];
@@ -254,7 +213,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex h-screen transition-colors duration-300 overflow-hidden">
+    <div className="app-shell bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex h-screen transition-colors duration-300 overflow-hidden">
       <Sidebar 
         conversations={conversations}
         activeConversationId={activeConversationId}
@@ -266,7 +225,6 @@ const App: React.FC = () => {
         onRenameConversation={handleRenameConversation}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
-        onOpenProjectBuilder={startBuilderConversation}
       />
        {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black/50 z-30 transition-opacity" />}
       <div className="flex flex-col flex-1 relative">
@@ -275,7 +233,11 @@ const App: React.FC = () => {
             <main 
                 className={`flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 transition-opacity duration-500 ${hasMessages ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             >
-                <MessageList messages={activeConversation?.messages ?? []} />
+                <div className="max-w-3xl mx-auto">
+                  <div className="chat-box">
+                    <MessageList messages={activeConversation?.messages ?? []} />
+                  </div>
+                </div>
             </main>
 
             <div 
@@ -296,14 +258,6 @@ const App: React.FC = () => {
                         isLoading={isLoading} 
                         onStopGenerating={handleStopGenerating}
                     />
-            {isProjectBuilderOpen && (
-              <ProjectBuilderModal 
-                onClose={() => setIsProjectBuilderOpen(false)} 
-                initialManifest={builderManifest}
-                initialProjectName={builderProjectName}
-                initialDescription={builderDescription}
-              />
-            )}
 
                 </div>
             </div>
